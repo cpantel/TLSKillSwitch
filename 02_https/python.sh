@@ -8,20 +8,17 @@ print urllib.urlopen("https://'$1'").read()'
 
 
 read -p "............................................................................................"
-gcc -Wall -fpic -shared -o shim.so shim_ssl_get_verify_result.c common.c -ldl -lssl
-LD_PRELOAD=./shim.so python -c 'import urllib 
+LD_PRELOAD=../tls_shims/shim_v1.so python -c 'import urllib 
 print urllib.urlopen("https://'$1'").read()'
 
 
 read -p "............................................................................................"
-gcc -Wall -fpic -shared -o shim.so shim_ssl_ctx_set_verify.c common.c -ldl -lssl
-LD_PRELOAD=./shim.so python -c 'import urllib 
+LD_PRELOAD=../tls_shims/shim_v2.so python -c 'import urllib 
 print urllib.urlopen("https://'$1'").read()'
 
 
 read -p "............................................................................................"
-gcc -Wall -fpic -shared -o shim.so shim_ssl_ctx_set_verify_short.c common.c -ldl -lssl
-LD_PRELOAD=./shim.so python -c 'import urllib 
+LD_PRELOAD=../tls_shims/shim_v3.so python -c 'import urllib 
 print urllib.urlopen("https://'$1'").read()'
 
 
