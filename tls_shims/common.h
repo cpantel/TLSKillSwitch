@@ -22,4 +22,6 @@ void print_san_name(const char* label, X509* const cert);
 void print_error_string(unsigned long err, const char* const label);
 void header(const char* label);
 
+#define BUFFER_LEN 1000
+typedef char buffer_t[BUFFER_LEN];
 #endif /* __common_h__ */

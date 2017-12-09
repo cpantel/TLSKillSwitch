@@ -13,7 +13,10 @@ long SSL_get_verify_result(const SSL *ssl) {
    void * handle = dlopen(LIBSSL_SO, RTLD_LAZY);
    long (*original_SSL_get_verify_result) (const SSL *ssl) = dlsym(handle, "SSL_get_verify_result");
    long result = (*original_SSL_get_verify_result)(ssl);
-   fprintf(stderr, "\n  ########## cheating SSL_get_verify_result -> %ld\n\n", result);
+   buffer_t buffer;
+   snprintf(buffer,BUFFER_LEN,"  SSL_get_verify_result -> %ld", result);
+   header(buffer);
+
    return X509_V_OK;
 }
 
@@ -29,6 +32,12 @@ void SSL_CTX_set_verify(
 ) {
    void * handle = dlopen(LIBSSL_SO, RTLD_LAZY);
    void (*original_SSL_CTX_set_verify) () = dlsym(handle, "SSL_CTX_set_verify");
-   fputs("\n  ########## cheating SSL_CTX_set_verify \n\n", stderr);
+
+   buffer_t buffer;
+   snprintf(buffer,BUFFER_LEN, "cheating SSL_CTX_set_verify");
+   header(buffer);
+
+
+
    (*original_SSL_CTX_set_verify)(ctx,mode,&my_verify_callback); 
 }
