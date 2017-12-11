@@ -1,0 +1,27 @@
+127.0.0.1	localhost
+
+127.0.0.1       inseguro.com               # sitio legitimo inseguro
+#127.0.0.1       seguro.com                 # sitio legitimo seguro
+#127.0.0.2       seguro.com                 # falso certificado, falsa CA
+#127.0.0.3       seguro.com                 # certificado robado, falsa CA
+127.0.0.4       seguro.com                 # certificado robado, root CA robada
+
+#127.0.0.5       www.clarin.com             # falso certificado, root CA legitima
+
+
+
+#127.0.0.3       mint                       # mint <- self signed
+#127.0.0.3       atacante.com
+#127.0.0.4       error.com                  # mint <- self signed
+
+#127.0.0.5 es el sitio atacante a clarin, con certificado de clarin <- ...CA
+#127.0.0.5       www.clarin.com
+
+# The following lines are desirable for IPv6 capable hosts
+#::1     ip6-localhost ip6-loopback
+#fe00::0 ip6-localnet
+#ff00::0 ip6-mcastprefix
+#ff02::1 ip6-allnodes
+#ff02::2 ip6-allrouters
+
+127.0.1.1	template
