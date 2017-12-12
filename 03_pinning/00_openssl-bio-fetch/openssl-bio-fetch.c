@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
         const SSL_METHOD* method = SSLv23_method();
         ssl_err = ERR_get_error();
         
-        ASSERT(NULL != method);
+        //ASSERT(NULL != method);
         if(!(NULL != method))
         {
             print_error_string(ssl_err, "SSLv23_method");
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
         /* ctx = SSL_CTX_new(TLSv1_method()); */
         ssl_err = ERR_get_error();
         
-        ASSERT(ctx != NULL);
+        //ASSERT(ctx != NULL);
         if(!(ctx != NULL))
         {
             print_error_string(ssl_err, "SSL_CTX_new");
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
         }
         
         /* https://www.openssl.org/docs/ssl/ctx_set_verify.html */
-        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, verify_callback);
+//        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, verify_callback);
         /* Cannot fail ??? */
         
         /* https://www.openssl.org/docs/ssl/ctx_set_verify.html */
@@ -126,23 +126,23 @@ int main(int argc, char* argv[])
         long old_opts = SSL_CTX_set_options(ctx, flags);
         UNUSED(old_opts);
         
-//        /* http://www.openssl.org/docs/ssl/SSL_CTX_load_verify_locations.html */
-//        res = SSL_CTX_load_verify_locations(ctx, "random-org-chain.pem", NULL);
-//        ssl_err = ERR_get_error();
-//        
-//        ASSERT(1 == res);
-//        if(!(1 == res))
-//        {
-//            /* Non-fatal, but something else will probably break later */
-//            print_error_string(ssl_err, "SSL_CTX_load_verify_locations");
-//            /* break; */
-//        }
+        /* http://www.openssl.org/docs/ssl/SSL_CTX_load_verify_locations.html */
+        res = SSL_CTX_load_verify_locations(ctx, "/home/carlos/Desktop/TLSKillSwitch/certificates/rootCA.crt", NULL);
+        ssl_err = ERR_get_error();
+        
+        //ASSERT(1 == res);
+        if(!(1 == res))
+        {
+            /* Non-fatal, but something else will probably break later */
+            print_error_string(ssl_err, "SSL_CTX_load_verify_locations");
+            /* break; */
+        }
         
         /* https://www.openssl.org/docs/crypto/BIO_f_ssl.html */
         web = BIO_new_ssl_connect(ctx);
         ssl_err = ERR_get_error();
         
-        ASSERT(web != NULL);
+        //ASSERT(web != NULL);
         if(!(web != NULL))
         {
             print_error_string(ssl_err, "BIO_new_ssl_connect");
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
         res = BIO_set_conn_hostname(web, target);
         ssl_err = ERR_get_error();
         
-        ASSERT(1 == res);
+        //ASSERT(1 == res);
         if(!(1 == res))
         {
             print_error_string(ssl_err, "BIO_set_conn_hostname");
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
         BIO_get_ssl(web, &ssl);
         ssl_err = ERR_get_error();
         
-        ASSERT(ssl != NULL);
+        //ASSERT(ssl != NULL);
         if(!(ssl != NULL))
         {
             print_error_string(ssl_err, "BIO_get_ssl");
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
         res = SSL_set_cipher_list(ssl, PREFERRED_CIPHERS);
         ssl_err = ERR_get_error();
         
-        ASSERT(1 == res);
+        //ASSERT(1 == res);
         if(!(1 == res))
         {
             print_error_string(ssl_err, "SSL_set_cipher_list");
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
         res = SSL_set_tlsext_host_name(ssl, HOST_NAME);
         ssl_err = ERR_get_error();
         
-        ASSERT(1 == res);
+        //ASSERT(1 == res);
         if(!(1 == res))
         {
             /* Non-fatal, but who knows what cert might be served by an SNI server  */
@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
         out = BIO_new_fp(stdout, BIO_NOCLOSE);
         ssl_err = ERR_get_error();
         
-        ASSERT(NULL != out);
+        //ASSERT(NULL != out);
         if(!(NULL != out))
         {
             print_error_string(ssl_err, "BIO_new_fp");
@@ -212,7 +212,7 @@ int main(int argc, char* argv[])
         res = BIO_do_connect(web);
         ssl_err = ERR_get_error();
         
-        ASSERT(1 == res);
+        //ASSERT(1 == res);
         if(!(1 == res))
         {
             print_error_string(ssl_err, "BIO_do_connect");
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
         res = BIO_do_handshake(web);
         ssl_err = ERR_get_error();
         
-        ASSERT(1 == res);
+        //ASSERT(1 == res);
         if(!(1 == res))
         {
             print_error_string(ssl_err, "BIO_do_handshake");
@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
         X509* cert = SSL_get_peer_certificate(ssl);
         if(cert) { X509_free(cert); } /* Free immediately */
         
-        ASSERT(NULL != cert);
+        //ASSERT(NULL != cert);
         if(NULL == cert)
         {
             /* Hack a code for print_error_string. */
@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
         /* Error codes: http://www.openssl.org/docs/apps/verify.html  */
         res = SSL_get_verify_result(ssl);
         
-        ASSERT(X509_V_OK == res);
+        //ASSERT(X509_V_OK == res);
         if(!(X509_V_OK == res))
         {
             /* Hack a code into print_error_string. */
@@ -293,7 +293,9 @@ int main(int argc, char* argv[])
         
         /* Step 3: hostname verifcation.   */
         /* An exercise left to the reader. */
-        
+       
+
+ 
         /**************************************************************************************/
         /**************************************************************************************/
         /* Now, we can finally start reading and writing to the BIO...                        */

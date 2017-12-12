@@ -1,5 +1,68 @@
 
-CERTIFICDOS
+
+Slides
+
+  http vs https
+
+     certificados
+         sneaker net
+         depender de una red o jerarquía de confianza
+  
+  rootCA vs falsaCA
+
+  firefox vs cada escenario
+
+  Desvío: random
+
+  regreso: shims
+
+  pinning
+     un navegador tiene que conectarse a sitios arbitrarios
+
+     una aplicación ya sabe a dónde va a conectarse, volvemos a una variante de sneakernet
+
+     hay dos maneras
+         compile time
+             implica redeploy ante cambios
+         first use - key continuity 
+             ventana de oportunidad en first use y cada renovación
+             
+   01  
+
+
+   02  usa SSL_CTX_load_verify_locations
+
+
+   03 debería hacer
+
+
+CERTIFICADOS
+
+              rootCA                falsaCA
+            /   |    \                 |
+           /    |     \                |
+          /     v      \               v
+         / seguro.com   \          seguro2.com
+        /      (1)       \
+       v                  v
+ www.clarin.com       seguro3.com
+    (2)                   (3)   
+
+
+(1) CA legal, sitio legal
+(2) CA comprometida, sitio cualquiera
+(3) CA comprometida, sitio propio
+(4) CA falsta, sitio...
+
+
+PASOS DE PINNING        
+.key     ->     .csr                                                  ---> .crt
+seguro.com (verdadero)   rootCA                                       ---> seguro.com
+seguro.com (falso)                 falsaCA                            ---> seguro2.com
+seguro.com (verdadero)             falsaCA                            ---> seguro3.com
+segruo.com (verdadero)                       rootCA comprometida      ---> seguro4.com
+
+
 
   rootCA
 
@@ -186,7 +249,26 @@ SETUP
        su
        vi /etc/hosts
 
+----------------------------------------------------------------------------------------
 
+
+openssl genrsa -out seguro.com.key 2048
+#  openssl rsa -in seguro.com.key -noout -text
+
+#  openssl rsa -in seguro.com.key -pubout -out seguro.com.pubkey
+#  openssl rsa -in seguro.com.pubkey -pubin -noout -text
+
+openssl req -new -key seguro.com.key -out seguro.com.csr
+#  openssl req -in seguro.com.csr -noout -text
+
+
+openssl genrsa -out rootCA.key 2048
+openssl req -new -x509 -key rootCA.key -out rootCA.crt
+
+
+openssl x509 -req -in seguro.com.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out example.org.crt
+
+# install rootCA.crt in client
 
 
 
