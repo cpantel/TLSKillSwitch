@@ -66,7 +66,7 @@ BIO* pkp_create_bio(SSL* ssl, int sock)
     return bio;
 }
 
-SSL* pkp_create_channel(SSL_CTX* ctx)
+SSL* pkp_create_channel(SSL_CTX* ctx, char * target)
 {
 #if defined(PUBKEY_PIN_VERBOSE) && (PUBKEY_PIN_VERBOSE >= 1)
     fprintf(stdout, "pkp_create_channel\n");
@@ -142,7 +142,7 @@ SSL* pkp_create_channel(SSL_CTX* ctx)
     }
     
     /* No documentation. Check the source code for s_client.c                  */
-    ret = SSL_set_tlsext_host_name(ssl, HOST_NAME);
+    ret = SSL_set_tlsext_host_name(ssl, target);
     ssl_err = ERR_get_error();
     
     ASSERT(1 == ret);
@@ -313,7 +313,7 @@ SSL_CTX* pkp_create_context(void)
         
         /* Enable standard certificate validation and our callback */
         /* https://www.openssl.org/docs/ssl/ctx_set_verify.html */
-        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, pkp_verify_cb);
+        SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, verify_callback);
         /* Cannot fail ??? */
         
         /* Remove most egregious */
@@ -322,7 +322,7 @@ SSL_CTX* pkp_create_context(void)
         UNUSED(old_opts);
         
         /* http://www.openssl.org/docs/ssl/SSL_CTX_load_verify_locations.html */
-        ret = SSL_CTX_load_verify_locations(ctx, "random-org-chain.pem", NULL);
+        ret = SSL_CTX_load_verify_locations(ctx, "/home/carlos/Desktop/TLSKillSwitch/certificates/rootCA.crt", NULL);
         ssl_err = ERR_get_error();
         
         /* Non-fatal */

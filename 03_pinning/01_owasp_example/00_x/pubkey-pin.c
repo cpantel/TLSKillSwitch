@@ -5,12 +5,13 @@
 
 int main(int argc, char* argv[])
 {
-    UNUSED(argc); UNUSED(argv);
-    
-#if !defined(NDEBUG)
-    InstallDebugTrapHandler();
-#endif
-    
+    if (argc != 2) {
+      printf("No destination\n");
+      abort();
+    }
+    char target[1000];
+    strncpy(target,argv[1],1000);
+
     int ret = 0, err = 0;
     
     SSL_CTX* ctx = NULL;
@@ -31,14 +32,14 @@ int main(int argc, char* argv[])
         /* Part 2: TCP/IP Socket   */
         /***************************/
         
-        sock = pkp_create_socket(HOST_NAME, HOST_PORT);
+        sock = pkp_create_socket(target, HOST_PORT);
         if(sock < 0)  break; /* failed */
         
         /***************************/
         /* Part 3: SSL/TLS Channel */
         /***************************/
         
-        ssl = pkp_create_channel(ctx);
+        ssl = pkp_create_channel(ctx, target);
         if(NULL == ssl)  break; /* failed */
         
         /***************************/
@@ -171,7 +172,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         /* http://www.openssl.org/docs/ssl/SSL_get_peer_certificate.html */
         cert = SSL_get_peer_certificate(ssl);
         ssl_err = (long)ERR_get_error();
-        
+CHECKPOINT;
         ASSERT(cert != NULL);
         if(!(cert != NULL))
         {
@@ -192,7 +193,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
             pkp_display_error("i2d_X509_PUBKEY (1)", ssl_err);
             break; /* failed */
         }
-        
+CHECKPOINT;        
         /* scratch */
         unsigned char* temp = NULL;
         
@@ -206,7 +207,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
             pkp_display_error("OpenSSL_malloc (1)", ssl_err);
             break; /* failed */
         }
-        
+ CHECKPOINT;       
         /* http://www.openssl.org/docs/crypto/d2i_X509.html */
         len2 = i2d_X509_PUBKEY(X509_get_X509_PUBKEY(cert), &temp);
         ssl_err = (long)ERR_get_error();
@@ -221,7 +222,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
             pkp_display_error("i2d_X509_PUBKEY (2)", ssl_err);
             break; /* failed */
         }
-        
+CHECKPOINT;     
         /* End Gyrations */
         
         /* We are getting ready to read (and possibly write) files. Be careful of fopen() and friends. */
@@ -235,9 +236,9 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         
         /* Write out the expected public key (useful for boot strapping during first run) */
 #if defined(WRITE_REMOTE_KEY_FILE)
-        BIO* file = BIO_new_file("random-org-xxx.der", "wx");
+        BIO* file = BIO_new_file("seguro.com.xxx.der", "wx");
         if(NULL == file)
-            file = BIO_new_file("random-org-xxx.der", "w");
+            file = BIO_new_file("seguro.com.xxx.der", "w");
         
         ASSERT(NULL != file);
         if(NULL != file) {
@@ -250,11 +251,11 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         
         /* See the warning above!!!                                            */
         /* http://pubs.opengroup.org/onlinepubs/009696699/functions/fopen.html */
-        fp = fopen("random-org.der", "rx");
+        fp = fopen("/home/carlos/Desktop/TLSKillSwitch/certificates/seguro.com.pubkey.bin", "rx");
         ssl_err = errno;
-        
+CHECKPOINT;        
         if(NULL ==fp) {
-            fp = fopen("random-org.der", "r");
+            fp = fopen("/home/carlos/Desktop/TLSKillSwitch/certificates/seguro.com.pubkey.bin", "r");
             ssl_err = errno;
         }
         
@@ -269,7 +270,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         /* http://pubs.opengroup.org/onlinepubs/009696699/functions/fseek.html */
         ret = fseek(fp, 0, SEEK_END);
         ssl_err = errno;
-        
+CHECKPOINT;        
         ASSERT(0 == ret);
         if(!(0 == ret))
         {
@@ -281,7 +282,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         /* http://pubs.opengroup.org/onlinepubs/009696699/functions/ftell.html */
         long size = ftell(fp);
         ssl_err = errno;
-        
+CHECKPOINT;        
         /* Arbitrary size, but should be relatively small (less than 1K or 2K) */
         ASSERT(size != -1 && size > 0 && size < 2048);
         if(!(size != -1 && size > 0 && size < 2048))
@@ -301,7 +302,7 @@ int pkp_pin_peer_pubkey(SSL* ssl)
             pkp_display_error("fseek (2)", ssl_err);
             break; /* failed */
         }
-        
+CHECKPOINT;        
         /* Re-use buff2 and len2 */
         buff2 = NULL; len2 = (int)size;
         
@@ -334,9 +335,12 @@ int pkp_pin_peer_pubkey(SSL* ssl)
         /*****************/
         /*    PAYDIRT    */
         /*****************/
+printf("len 1 vs size %d, %d\n", len1, (int)size);
+printf("len 2 vs size %d, %d\n", len2, (int)size);
         ASSERT(len1 == (int)size);
         ASSERT(len2 == (int)size);
         ASSERT(0 == memcmp(buff1, buff2, (size_t)size));
+ CHECKPOINT;       
         if(len1 != (int)size || len2 != (int)size || 0 != memcmp(buff1, buff2, (size_t)size))
         {
 #if 0
@@ -388,11 +392,11 @@ int pkp_pin_peer_pubkey(SSL* ssl)
 
 /***************************************************************************/
 /* pkp_ssl_connect() is the first fun function. It will kick-off a         */
-/* number of calls to pkp_verify_cb(). If pkp_verify_cb() returns 1,       */
+/* number of calls to verify_callback(). If verify_callback() returns 1,       */
 /* then all verifcation errors are all ignored. In this case, verifcation  */
 /* MUST occur via pkp_pin_peer_pubkey() (Part 6 above).                    */
 /*                                                                         */
-/* If pkp_verify_cb() returns 0, then SSL_connect() will return            */
+/* If verify_callback() returns 0, then SSL_connect() will return            */
 /* SSL_ERROR_SSL and this function will fail. Extended error information   */
 /* is then retireved via ERR_get_error(). If the extended information is   */
 /* 0x14090086, then the error is "certificate verify failed."              */
@@ -570,7 +574,7 @@ void pkp_print_san_name(const char* label, X509* const cert, int nid)
 /*                                                                       */
 /* Or we can observe it...                                               */
 /*************************************************************************/
-int pkp_verify_cb(int preverify, X509_STORE_CTX* x509_ctx)
+int verify_callback(int preverify, X509_STORE_CTX* x509_ctx)
 {
     /* For error codes, see http://www.openssl.org/docs/apps/verify.html  */
     
@@ -581,7 +585,7 @@ int pkp_verify_cb(int preverify, X509_STORE_CTX* x509_ctx)
     X509_NAME* iname = cert ? X509_get_issuer_name(cert) : NULL;
     X509_NAME* sname = cert ? X509_get_subject_name(cert) : NULL;
     
-    fprintf(stdout, "pkp_verify_cb (depth=%d)(preverify=%d)\n", depth, preverify);
+    fprintf(stdout, "verify_callback (depth=%d)(preverify=%d)\n", depth, preverify);
     
     /* Issuer is the authority we trust that warrants nothing useful */
     pkp_print_cn_name("Issuer (cn)", iname, NID_commonName);

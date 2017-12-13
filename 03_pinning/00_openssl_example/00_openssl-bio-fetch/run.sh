@@ -11,13 +11,13 @@ read -p "========== Falso certificado, falsa CA =========="
 
 
 read -p "========== Con shim v1 =========="
-LD_PRELOAD=../../tls_shims/shim_v1.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v1.so ./openssl-bio-fetch.exe seguro.com:443
 
 read -p "========== Con shim v2 =========="
-LD_PRELOAD=../../tls_shims/shim_v2.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v2.so ./openssl-bio-fetch.exe seguro.com:443
 
 read -p "========== Con shim v3 =========="
-LD_PRELOAD=../../tls_shims/shim_v3.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v3.so ./openssl-bio-fetch.exe seguro.com:443
 
 
 
@@ -26,18 +26,18 @@ read -p "========== Certificado robado, falsa CA =========="
 ./openssl-bio-fetch.exe seguro.com:443
 
 read -p "========== Con shim v1 =========="
-LD_PRELOAD=../../tls_shims/shim_v1.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v1.so ./openssl-bio-fetch.exe seguro.com:443
 
 read -p "========== Con shim v2 =========="
-LD_PRELOAD=../../tls_shims/shim_v2.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v2.so ./openssl-bio-fetch.exe seguro.com:443
 
 read -p "========== Con shim v3 =========="
-LD_PRELOAD=../../tls_shims/shim_v3.so ./openssl-bio-fetch.exe seguro.com:443
+LD_PRELOAD=../../../tls_shims/shim_v3.so ./openssl-bio-fetch.exe seguro.com:443
 
 
-sed '5d' -i "$HOSTS" ; sed '5i\127.0.0.4       seguro.com' -i "$HOSTS"
-read -p "certificado robado, root CA robada"
-./openssl-bio-fetch.exe seguro.com:443
+#sed '5d' -i "$HOSTS" ; sed '5i\127.0.0.4       seguro.com' -i "$HOSTS"
+#read -p "certificado robado, root CA robada"
+#./openssl-bio-fetch.exe seguro.com:443
 
 
 
