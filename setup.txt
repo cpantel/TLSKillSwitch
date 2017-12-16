@@ -1,0 +1,6 @@
+generate symlinks to mount
+copy
+   rootCA.crt
+ to
+   /usr/share/ca-certificates/mozilla
+   /etc/ssl/certs
