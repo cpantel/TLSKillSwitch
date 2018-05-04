@@ -4,12 +4,29 @@ Código y texto de lo presentado en:
 
 [OWASP LATAM Tour 2018 BsAs](https://www.owasp.org/index.php/LatamTour2018#tab=ARGENTINA_-_Buenos_Aires)
 
-Ajustar lo que hay en la carpeta mount para que funcione el servidor apache.
+[Viernes Ñoños en CADIEEL](https://groups.google.com/forum/?hl=en#!topic/embebidos32/88bOqO63eWw)
+
+## Instrucciones
+
+Mejor implementar en una virtual.
+
+Ajustar lo que hay en la carpeta mount para que funcione el servidor apache. Toqueteando /etc/hosts se apunta a los diversos virtual hosts.
 
 Regenerar lo que haya en la carpeta de certificados que está todo vencido.
 
 De la carpeta 03_pinning, sólo 01_owasp_example tiene algo útil.
 
+## Ejercicios propuestos
+
+Reemplazar srandom() en lugar de random() y meditar acerca de la utilidad de este cambio. Pista: unit testing.
+
+Implementar un keylogger antes de mirar la implementación propuesta.
+
+Jugar un rato con lo de TLS con el servidor configurado, cambiando a que virtual hosts apuntan los nombres.
+
+Defenderse de 03_pinning/01_owasp_example/v4 sin mirar 03_pinning/01_owasp_example/v5.
+
+Atacar 03_pinning/01_owasp_example/v5.
 
 ## The Googler Way: 
 
@@ -22,6 +39,9 @@ https://0x00sec.org/t/linux-infecting-running-processes/1097
 http://fluxius.handgrep.se/2011/10/31/the-magic-of-ld_preload-for-userland-rootkits/
 
 https://datacenteroverlords.com/2012/03/01/creating-your-own-ssl-certificate-authority/
+
+https://blog.fpmurphy.com/2012/09/all-about-ld_preload.html
+
 
 ## The Developer Way: RTFM
 
